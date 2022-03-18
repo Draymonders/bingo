@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	api  jsoniter.API
+	api jsoniter.API
 )
 
 func init() {
