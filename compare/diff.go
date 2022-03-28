@@ -63,7 +63,6 @@ func deepEqualWithField(v1, v2 reflect.Value, t reflect.Type) (bool, []string) {
 			Log.Debugf("t.Field(%v).Name %v v1.Field().Interface() %v v2.Field().Interface() %v ", i, t.Field(i).Name, field.Interface(), v2.Field(i).Interface())
 		}
 
-
 		if !isEqualInterface(field.Interface(), v2.Field(i).Interface()) {
 			diffNames = append(diffNames, t.Field(i).Name)
 		}
