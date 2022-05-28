@@ -1,7 +1,7 @@
 package json
 
 import (
-	"github.com/draymonders/bingo/log"
+	. "github.com/draymonders/bingo/log"
 	jsoniter "github.com/json-iterator/go"
 )
 
@@ -22,7 +22,7 @@ func init() {
 func ObjToJson(obj interface{}) string {
 	s, err := api.MarshalToString(obj)
 	if err != nil {
-		log.Error("marshal err. %+v", err)
+		Log.Errorf("marshal err. %+v", err)
 	}
 	return s
 }
