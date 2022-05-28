@@ -1,4 +1,4 @@
-package json
+package utils
 
 import (
 	. "github.com/draymonders/bingo/log"

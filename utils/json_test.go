@@ -1,4 +1,4 @@
-package json
+package utils
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ func Test_Id_Unmarshal(t *testing.T) {
 	data := map[string]interface{}{}
 	err := JsonToObj(str, &data)
 	if err != nil {
-		fmt.Println("json err")
+		fmt.Println("jsonToObj err")
 		return
 	}
 	fmt.Println(data)

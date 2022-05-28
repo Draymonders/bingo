@@ -1,4 +1,4 @@
-package compare
+package utils
 
 /*
    1. 按字段一个一个的去diff，后续维护比较麻烦

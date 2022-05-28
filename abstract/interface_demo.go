@@ -1,27 +1,27 @@
-package itf
+package abstract
 
 import (
 	"fmt"
 
-	"github.com/draymonders/bingo/json"
+	"github.com/draymonders/bingo/utils"
 )
 
 type Obj interface {
 	GetId() int64
 }
 
-type CompanyNameEr interface {
+type ICompany interface {
 	GetCompanyName() string
 }
 
-type PersonNameEr interface {
+type IPerson interface {
 	GetPersonName() string
 }
 
 type Subject struct {
-	Id          int64  `json:"id"`
-	PersonName  string `json:"person_name"`
-	CompanyName string `json:"company_name"`
+	Id          int64  `utils:"id"`
+	PersonName  string `utils:"person_name"`
+	CompanyName string `utils:"company_name"`
 }
 
 func (s *Subject) GetId() int64 {
@@ -33,18 +33,18 @@ func (s *Subject) GetPersonName() string {
 }
 
 // 根据传入的obj进行打印
-func format(obj Obj) {
+func print(obj Obj) {
 	if obj == nil {
 		fmt.Println("obj is null")
 		return
 	}
-	fmt.Printf("format obj: %v\n", json.ObjToJson(obj))
+	fmt.Printf("format obj: %v\n", utils.ObjToJson(obj))
 
-	if er, ok := obj.(CompanyNameEr); ok {
+	if er, ok := obj.(ICompany); ok {
 		companyName := er.GetCompanyName()
 		fmt.Println("companyName: ", companyName)
 	}
-	if er, ok := obj.(PersonNameEr); ok {
+	if er, ok := obj.(IPerson); ok {
 		personName := er.GetPersonName()
 		fmt.Println("personName: ", personName)
 	}
@@ -53,7 +53,7 @@ func format(obj Obj) {
 // interface转换
 func RunItfTrans() {
 	var obj Obj
-	format(obj)
+	print(obj)
 	fmt.Printf("====\n")
 
 	obj = &Subject{
@@ -61,6 +61,6 @@ func RunItfTrans() {
 		PersonName:  "22",
 		CompanyName: "333",
 	}
-	format(obj)
+	print(obj)
 	fmt.Printf("====\n")
 }

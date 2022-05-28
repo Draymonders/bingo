@@ -1,4 +1,4 @@
-package compare
+package utils
 
 import (
 	"fmt"
@@ -102,7 +102,6 @@ func Test_InterfaceEqual(t *testing.T) {
 		t.Logf("equal differentTypeNames %v", differentTypeNames)
 	}
 }
-
 
 func Test_Reflect_Demo1(t *testing.T) {
 	m := buildINode(1)

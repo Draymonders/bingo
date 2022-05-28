@@ -1,4 +1,4 @@
-package wrap
+package utils
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-const UN_KNOWN = "UN_KNOWN"
+const UnKnown = "UN_KNOWN"
 
 type Wrapper struct {
 	fileName   string // 文件名
@@ -15,8 +15,8 @@ type Wrapper struct {
 }
 
 func NewWrapper() *Wrapper {
-	fileName := UN_KNOWN
-	funcName := UN_KNOWN
+	fileName := UnKnown
+	funcName := UnKnown
 	fileLine := 0
 	if pc, codePath, line, ok := runtime.Caller(1); ok {
 		fileName = getLastName(codePath)
