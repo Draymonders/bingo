@@ -72,10 +72,7 @@ func (this *LRUCache) moveToFront(node *DoubleLinkListNode) {
 	if node == nil {
 		panic("node is nil")
 	}
-	if node.Next != nil && node.Pre != nil {
-		node.Next.Pre = node.Pre
-		node.Pre.Next = node.Next
-	}
+	this.removeNode(node)
 
 	nxt := this.vHead.Next
 	this.vHead.Next = node
@@ -85,14 +82,20 @@ func (this *LRUCache) moveToFront(node *DoubleLinkListNode) {
 
 }
 
+func (this *LRUCache) removeNode(node *DoubleLinkListNode) {
+	if node == nil || node.Pre == nil || node.Next == nil {
+		return
+	}
+	node.Next.Pre = node.Pre
+	node.Pre.Next = node.Next
+}
+
 func (this *LRUCache) removeLastNode() int {
 	if this.len == 0 {
 		panic(" can not remove")
 	}
 	last := this.vLast.Pre
-
-	last.Pre.Next = this.vLast
-	this.vLast.Pre = last.Pre
+	this.removeNode(last)
 	return last.Key
 }
 
