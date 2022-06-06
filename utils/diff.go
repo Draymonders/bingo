@@ -14,15 +14,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var debug bool
-
 func init() {
 	Init(logrus.DebugLevel)
-	debug = false
-}
-
-func SetDebug(f bool) {
-	debug = true
 }
 
 type ICompare interface {
@@ -59,7 +52,7 @@ func deepEqualWithField(v1, v2 reflect.Value, t reflect.Type) (bool, []string) {
 	for i := 0; i < v1.NumField(); i++ {
 		// field为type StructField类型
 		field := v1.Field(i)
-		if debug {
+		if IsDebug() {
 			Log.Debugf("t.Field(%v).Name %v v1.Field().Interface() %v v2.Field().Interface() %v ", i, t.Field(i).Name, field.Interface(), v2.Field(i).Interface())
 		}
 
