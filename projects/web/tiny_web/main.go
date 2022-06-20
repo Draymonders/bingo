@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	serverV1()
+	serverV2()
 }
 
 func serverV0() {
@@ -20,8 +20,19 @@ func serverV0() {
 	}
 }
 
+// serverV1 map控制路由
 func serverV1() {
 	server := NewServerWithHandler(NewHandlerBaseOnMap(), MetricBuilder)
+	server.Route("GET", "/user", GetUserInfoV1)
+
+	if err := server.Start(":8080"); err != nil {
+		panic(err)
+	}
+}
+
+// serverV2 路由树控制路由
+func serverV2() {
+	server := NewServerWithHandler(NewHandlerBasedOnTree(), MetricBuilder)
 	server.Route("GET", "/user", GetUserInfoV1)
 
 	if err := server.Start(":8080"); err != nil {
