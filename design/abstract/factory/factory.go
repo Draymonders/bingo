@@ -1,4 +1,4 @@
-package abstract
+package factory
 
 import (
 	. "github.com/draymonders/bingo/log"
