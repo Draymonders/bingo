@@ -35,9 +35,9 @@ func deleteNode(root *TreeNode, key int) *TreeNode {
 			     / \     /  \                      / \   / \
 				1   4   6    10                   1  4  6  10
 			       /                                /
-				  3                                 2.5
+				  3                                 3.5
 			       \
-			       2.5
+			       3.5
 		*/
 
 		sucNode, sucParentNode := root.Right, root // 后继节点，后继节点的父节点
@@ -116,4 +116,32 @@ func inOrderVisit(rt *TreeNode) []int {
 	res = append(res, inOrderVisit(rt.Right)...)
 
 	return res
+}
+
+/*
+给一个target，将小于target的节点都挪到左子树，大于target的节点都挪到右子树，并保持树结构不变
+*/
+func findNodeAndChangeItToRoot(root *TreeNode, key int) *TreeNode {
+
+	// root.Val == key, 找前驱节点，替换掉当前根节点
+	// eg.  key=6
+	/*
+														 6
+														/  \
+		              5                               5      7
+			        /    \                           /        \
+			       2       7             ====>      3         10
+			     / \      /  \                      / \
+				1   4    6    10                   1  4
+			       /      \                           /
+				  3       6.5                       3.5
+			       \
+			       3.5
+	*/
+
+	// 解决思路：
+	//  找到target节点，并找到前驱节点，以前驱节点构建左子树
+	//      同理，找到后继节点，以后继节点构建右子树
+	//  前驱节点和后继节点分别作为targetNode的左儿子和右儿子
+
 }
