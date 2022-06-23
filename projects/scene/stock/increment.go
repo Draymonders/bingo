@@ -1,7 +1,6 @@
 package stock
 
 import (
-	"context"
 	"fmt"
 	"math/rand"
 	"os"
@@ -12,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const productNum = 100
+const productNum = 10
 
 var db *gorm.DB
 
@@ -79,7 +78,7 @@ func IncrementV1(n int) {
 	chs := make(chan struct{}, goRoutineNums)
 	wg := sync.WaitGroup{}
 
-	// 开100个协程去update
+	// 开goRoutineNums个协程去update
 	for i := 0; i < goRoutineNums; i++ {
 		wg.Add(1)
 		go func(id int) {
@@ -101,9 +100,8 @@ func IncrementV1(n int) {
 						return nil
 					})
 					if dbErr != nil {
-						//fmt.Printf("%v err %v\n", jobPrefix, dbErr)
 						// 稍微休息下
-						time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond)
+						gap()
 					}
 				}
 			}
@@ -146,7 +144,111 @@ func calcCount(timeout int) {
 	fmt.Printf("stock_nums %v used %vs\n", cnt, timeout)
 }
 
-func IncrementV2(ctx context.Context) {
+func IncrementV2(n int) {
+	Init()
+
+	// 测算下timeout的时间内能更新多少数据
+	timeout := 10
+	producerNum, consumerNum := n*productNum, productNum
+	allNum := producerNum + consumerNum
+	stopChs := make(chan struct{}, allNum)
+	wg := sync.WaitGroup{}
+
+	bufferSize := 1000
+
+	queues := make([]chan struct{}, productNum+1)
+	for i := 0; i <= productNum; i++ {
+		queues[i] = make(chan struct{}, bufferSize)
+	}
+
+	for i := 1; i <= consumerNum; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			vId := id%productNum + 1
+			pId := productId(vId)
+			for {
+				select {
+				case <-stopChs:
+					fmt.Printf("consume productId %v done\n", pId)
+					return
+				default:
+					consume(pId, queues[vId])
+				}
+			}
+		}(i)
+	}
+	// 开 producerNum 个协程去 produce msg
+	for i := 0; i < producerNum; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			vId := id%productNum + 1
+			pId := productId(vId)
+
+			jobPrefix := fmt.Sprintf("producer ProductId %v ", pId)
+
+			for {
+				select {
+				case <-stopChs:
+					fmt.Printf("%v done\n", jobPrefix)
+					return
+				default:
+					produce(queues[vId])
+				}
+			}
+		}(i)
+	}
+
+	// timeouts 运算
+	go func() {
+		timeOutCh := time.After(time.Duration(timeout) * time.Second)
+		select {
+		case <-timeOutCh:
+			for i := 1; i <= allNum; i++ {
+				stopChs <- struct{}{}
+			}
+			fmt.Printf("!!! timeout, so close all sub jobs\n")
+		}
+	}()
+
+	wg.Wait()
+	// 都结束了的话，查询下总cnt
+
+	calcCount(timeout)
+
+	// => stock_nums 21891 used 10s
+	// => stock_nums 21918 used 10s
+	// => stock_nums 21795 used 10s
+}
+
+// produce 生产
+func produce(queue chan struct{}) {
+	queue <- struct{}{}
+	gap()
+}
+
+// consume 消费
+func consume(pId int64, queue <-chan struct{}) {
+	sum := 0
+	timeoutCh := time.After(time.Duration(100) * time.Millisecond)
+collect:
+	for {
+		select {
+		case <-timeoutCh:
+			break collect
+		case <-queue:
+			sum++
+		}
+	}
+
+	dbErr := db.Transaction(func(tx *gorm.DB) error {
+		db.Table("t_stock").Where("product_id = ?", pId).Updates(map[string]interface{}{"stock_num": gorm.Expr("stock_num + ?", sum)})
+		return nil
+	})
+	if dbErr != nil {
+		gap()
+	}
 }
 
 type stockModel struct {
@@ -157,4 +259,8 @@ type stockModel struct {
 
 func productId(i int) int64 {
 	return int64(1000 + i)
+}
+
+func gap() {
+	time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond)
 }
