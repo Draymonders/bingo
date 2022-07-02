@@ -1,25 +1,24 @@
-package pool
+package group
 
 import (
-	"code.byted.org/gopkg/lang/maths"
 	"go.uber.org/atomic"
 	"golang.org/x/sync/errgroup"
 )
 
-// todo @yubing 看看和 errGroup的区别
-
-var token = struct{}{}
-
 type BatchPool struct {
-	batchLimit       chan struct{}
 	allowPartSuccess bool
-	eg               errgroup.Group
+	eg               *errgroup.Group
 	err              atomic.Error
 }
 
+// allowPartSuccess: true, 所有都执行
+// allowPartSuccess: false, 遇到失败，后续goroutine 快速关闭
 func NewBatchPool(batchNum int, allowPartSuccess bool) *BatchPool {
-	batchNum = maths.MaxInt(1, batchNum)
-	return &BatchPool{batchLimit: make(chan struct{}, batchNum), allowPartSuccess: allowPartSuccess}
+	var eg errgroup.Group
+	if batchNum > 1 {
+		eg.SetLimit(batchNum)
+	}
+	return &BatchPool{eg: &eg, allowPartSuccess: allowPartSuccess}
 }
 
 func (b *BatchPool) Go(f func() error) {
@@ -27,12 +26,7 @@ func (b *BatchPool) Go(f func() error) {
 		return
 	}
 
-	b.batchLimit <- token
-
 	b.eg.Go(func() (err error) {
-		defer func() {
-			<-b.batchLimit
-		}()
 		if b.isFinish() { // fast fail 只要有一个失败就不继续走下去了
 			return
 		}
@@ -53,4 +47,11 @@ func (b *BatchPool) Wait() error {
 
 func (b *BatchPool) isFinish() bool {
 	return b.err.Load() != nil && !b.allowPartSuccess
+}
+
+func maxInt(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
