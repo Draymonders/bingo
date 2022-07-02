@@ -28,7 +28,7 @@ func asyncGo(req *req) {
 
 // handleSync 同步方法
 func syncGo(req *req) (*resp, error) {
-	c := _go(req, make(chan token, 1))
+	c := _go(req, make(chan token))
 	<-c.done
 	return c.resp, c.err
 }
