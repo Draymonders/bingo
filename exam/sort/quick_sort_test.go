@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/draymonders/bingo/leetcode/common"
+	"github.com/draymonders/bingo/exam/common"
 )
 
 func Test_MultiTopK(t *testing.T) {

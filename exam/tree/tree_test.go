@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	. "github.com/draymonders/bingo/leetcode/common"
+	. "github.com/draymonders/bingo/exam/common"
 )
 
 // 测试最大路径和

@@ -3,7 +3,7 @@ package tree
 import (
 	"fmt"
 
-	. "github.com/draymonders/bingo/leetcode/common"
+	. "github.com/draymonders/bingo/exam/common"
 )
 
 var debug bool
