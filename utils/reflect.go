@@ -73,3 +73,71 @@ func isEqualInterface(x, y interface{}) bool {
 	}
 	return reflect.DeepEqual(x, y)
 }
+
+// todo @yubing 增加单测
+func Struct2MapJson(obj interface{}) interface{} {
+	if obj == nil {
+		return nil
+	}
+	t := reflect.TypeOf(obj)
+	v := reflect.ValueOf(obj)
+
+	if t.Kind() == reflect.Ptr {
+		if v.IsNil() {
+			return nil
+		}
+		v = v.Elem()
+		t = reflect.TypeOf(v.Interface())
+	}
+
+	if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
+		if v.IsNil() {
+			return nil
+		}
+
+		l := v.Len()
+		if l == 0 {
+			return nil
+		}
+		av := make([]interface{}, l)
+		for i := 0; i < l; i++ {
+			if v.Index(i).IsNil() { // slice 成员，nil 判断
+				continue
+			}
+			r := Struct2MapJson(v.Index(i).Elem().Interface())
+			if r != nil {
+				av[i] = r
+			}
+		}
+		return av
+	} else if v.Kind() == reflect.Map {
+		r := make(map[string]interface{}, len(v.MapKeys()))
+		for _, element := range v.MapKeys() {
+			//fmt.Println(key, element) // how to get the value?
+			val := v.MapIndex(element)
+			r[element.Interface().(string)] = Struct2MapJson(val.Interface())
+		}
+		if len(r) == 0 {
+			return nil
+		}
+		return r
+	} else if v.Kind() == reflect.Struct {
+		var data = make(map[string]interface{}, t.NumField())
+		for i := 0; i < t.NumField(); i++ {
+			name := t.Field(i).Tag.Get("json")
+			if name == "" {
+				name = t.Field(i).Name
+			}
+			v1 := v.Field(i).Interface()
+			if v1 == nil {
+				continue
+			}
+			r := Struct2MapJson(v1)
+			if r != nil {
+				data[name] = r
+			}
+		}
+		return data
+	}
+	return v.Interface()
+}
