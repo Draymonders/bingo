@@ -1,5 +1,6 @@
 package array
 
+// 最大字段和
 func maxSubArray(nums []int) int {
 	res := -0x3f3f3f3f
 	ans := 0

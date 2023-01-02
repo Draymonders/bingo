@@ -1,0 +1,30 @@
+LC 902
+=>i:0 isLimit:1 isLeadZero:1
+ =>i:1 isLimit:0 isLeadZero:1
+  =>i:2 isLimit:0 isLeadZero:1
+  <==i:2 isLeadZero:1 ans: 0
+  **i:2 v: 1 tmp:1
+  **i:2 v: 4 tmp:1
+  **i:2 v: 9 tmp:1
+  <=i:2 up:9 down:1 ans: 3
+ <==i:1 isLeadZero:1 ans: 3
+  $$i:2 isLimit:0 isLeadZero:0 dp[i]:3
+ **i:1 v: 1 tmp:3
+  $$i:2 isLimit:0 isLeadZero:0 dp[i]:3
+ **i:1 v: 4 tmp:3
+  $$i:2 isLimit:0 isLeadZero:0 dp[i]:3
+ **i:1 v: 9 tmp:3
+ <=i:1 up:9 down:1 ans: 12
+<==i:0 isLeadZero:1 ans: 12
+ $$i:1 isLimit:0 isLeadZero:0 dp[i]:12
+**i:0 v: 1 tmp:12
+<=i:0 up:2 down:1 ans: 24
+case[3] input: 1 4 9 
+input2: 200 output: 24, but expect: 21
+
+
+// 1 4 9
+// 11 14 19 41 44 49 91 94 99
+// 21 24 29 41 44 49 91 94 99
+// 中间没有 0
+// 1开头的怎么有12个
