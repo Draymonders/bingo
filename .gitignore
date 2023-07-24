@@ -18,3 +18,13 @@ output/
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+./utils/hive/*_test.go
+utils/hive/author/*.go
+utils/hive/group/*.go
+utils/hive/score/*.go
+utils/hive/*_test.go
+
+
+company/
+company/*.go

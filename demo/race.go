@@ -1,16 +1,27 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
 
-func request(c *string) {
-	println(fmt.Sprintf("fullPath: %s", *c))
+func main() {
+	doCtx()
 }
 
-func main() {
+func doCtx() {
+	ctx := context.Background()
 
+	ctx = context.WithValue(ctx, "k1", "v1")
+	ctx = context.WithValue(ctx, "k1", "v2")
+
+	v := ctx.Value("k1").(string)
+	fmt.Println(v)
+}
+
+// 竞争，会panic
+func race() {
 	fullPath := "init"
 
 	go func() {
@@ -25,5 +36,8 @@ func main() {
 		fullPath = "/test/test/test"
 		time.Sleep(10 * time.Nanosecond)
 	}
+}
 
+func request(c *string) {
+	println(fmt.Sprintf("fullPath: %s", *c))
 }
